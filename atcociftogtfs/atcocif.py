@@ -36,8 +36,8 @@ class atcocif:
     epsg = None  # EPSG code (None = skip coordinate processing)
     file_num = 0  # Incrementing file counter
     final_date = None  # Final yyyymmdd date of service (default via __init__)
-    grid_figures = None  # Northing/Easting grid ref figures (None = guess)
-    gtfs_filename = None  # GTFS output zip filename (None = fail dump)
+    grid = None  # Northing/Easting grid ref figures (None = guess)
+    gtfs = None  # GTFS output zip filename (None = fail dump)
     in_trip = False  # Currently processing a trip_id
     last_hour = 0  # Hour of the last stop_time processed
     line_num = 0  # Incrementing file line counter
@@ -68,7 +68,7 @@ class atcocif:
 
     _arg_vars = [
         "bank_holidays", "epsg", "directional_routes", "final_date",
-        "grid_figures", "gtfs_filename", "mode", "unique_ids",
+        "grid", "gtfs", "mode", "unique_ids",
         "verbose", "school_term", "timezone"
     ]  # These variables can be overwritten by arguments of the same name
 
@@ -255,12 +255,12 @@ class atcocif:
 
     def dump(self, filename=None):
         """Creates GTFS zip archive @param filename and writes in processed
-        data, @return 1 OK or 0 not."""
+        data, @return 0 OK or 1 not."""
 
         if filename is None:
-            if self.gtfs_filename is None:
+            if self.gtfs is None:
                 return 1
-            filename = self.gtfs_filename
+            filename = self.gtfs
 
         try:
             c = self.db.cursor()
@@ -402,7 +402,7 @@ class atcocif:
             logging.getLogger(__name__).exception(
                 "Error processing line %s of %s: %s",
                 self.line_num,
-                os.path.basename(self.base_filename),
+                self.base_filename,
                 e,
             )
             return 1
@@ -445,7 +445,7 @@ class atcocif:
                         "Check %s's stops.txt for details."
                     ),
                     fetched[0],
-                    self.gtfs_filename,
+                    self.gtfs,
                 )
 
         if topic is None or topic == "duplication":
@@ -1377,11 +1377,13 @@ class atcocif:
                         and "easting" in self.stop_cache[stop_id]
                         and "northing" in self.stop_cache[stop_id]
                     ):
-                        if self.grid_figures is None:
+                        if self.grid is None:
                             # Assume accuracy of first applies to all
-                            self.grid_figures = len(
+                            self.grid = max(len(
                                 self.stop_cache[stop_id]["easting"].strip()
-                            )
+                            ), len(
+                                self.stop_cache[stop_id]["northing"].strip()
+                            ))
 
                         latlog = transformer.transform(
                             self.sanitize_grid_ref(
@@ -1436,7 +1438,7 @@ class atcocif:
                 ),
                 out_of_bounds,
                 self.epsg,
-                self.grid_figures,
+                self.grid,
             )
 
         if len(insert) > 0 or len(update) > 0:
@@ -1614,7 +1616,7 @@ class atcocif:
         try:
             return float("{}{}".format(
                 ref.strip(),
-                "0" * max(8 - self.grid_figures, 0)
+                "0" * max(8 - self.grid, 0)
             )) / 100
 
         except ValueError:

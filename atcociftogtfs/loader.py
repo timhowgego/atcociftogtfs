@@ -14,6 +14,7 @@ import time
 import zipfile
 
 from atcociftogtfs.atcocif import atcocif
+from atcociftogtfs import __version__
 
 
 def main(args=None):
@@ -29,9 +30,9 @@ def main(args=None):
     else:
         logging_level = logging.WARNING
 
-    if hasattr(args, "log_filename") and args.log_filename is not None:
+    if hasattr(args, "log") and args.log is not None:
         logging.basicConfig(
-            filename=args.log_filename,
+            filename=args.log,
             level=logging_level,
             format="%(asctime)s:%(levelname)s:%(message)s",
         )
@@ -52,24 +53,24 @@ def main(args=None):
     if hasattr(args, "verbose") and args.verbose:
         processor.report(topic=None)
 
-    if not hasattr(args, "gtfs_filename"):
+    if not hasattr(args, "gtfs"):
         logging.error("No output file specified.")
         return 1
 
-    status = processor.dump(filename=args.gtfs_filename)
+    status = processor.dump(filename=args.gtfs)
 
     if status == 0:
         if processor.file_num > 1:
             logging.info(
                 "Completed %s from %s ATCO-CIF files. Finished in %ss.",
-                args.gtfs_filename,
+                args.gtfs,
                 processor.file_num,
                 round(time.time() - start_time),
             )
         else:
             logging.info(
                 "Completed %s. Finished in %ss.",
-                args.gtfs_filename,
+                args.gtfs,
                 round(time.time() - start_time),
             )
 
@@ -86,6 +87,7 @@ def arguments():
         description="Converts ATCO.CIF files into GTFS format.",
         prog="atcociftogtfs",
     )
+    parser.version = __version__
 
     parser.add_argument(
         "source",
@@ -135,10 +137,10 @@ def arguments():
         "-r",
         "--grid",
         nargs="?",
-        dest="grid_figures",
+        dest="grid",
         type=int,
         help="""Number of figures in each Northing or Easting grid reference
-        value. ATCO-CIF should holds 8 figure grid references, but may
+        value. ATCO-CIF should hold 8 figure grid references, but may
         contain less. Optional, defaults to best fit.""",
     )
     parser.add_argument(
@@ -146,7 +148,7 @@ def arguments():
         "--gtfs",
         nargs="?",
         default="gtfs.zip",
-        dest="gtfs_filename",
+        dest="gtfs",
         help="""Output GTFS zip filename (directory optional). Optional,
         defaults in gtfs.zip.""",
     )
@@ -154,7 +156,7 @@ def arguments():
         "-l",
         "--log",
         nargs="?",
-        dest="log_filename",
+        dest="log",
         help="""Append feedback to this text filename (directory optional),
         not the console. Optional, defaults to console.""",
     )
@@ -185,6 +187,12 @@ def arguments():
         action="store_true",
         help="""Verbose feedback of all progress to log or console. Optional,
         defaults to warnings and errors only.""",
+    )
+    parser.add_argument(
+        "-V",
+        "--version",
+        action="version",
+        help="""Prints atcociftogtfs version and exits.""",
     )
     parser.add_argument(
         "-s",

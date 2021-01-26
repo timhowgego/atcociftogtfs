@@ -17,8 +17,8 @@ class test_loader(unittest.TestCase):
             with tempfile.NamedTemporaryFile(delete=False) as gtfs:
                 with tempfile.NamedTemporaryFile(delete=False) as log:
                     args = types.SimpleNamespace(
-                        gtfs_filename=gtfs.name,
-                        log_filename=log.name,
+                        gtfs=gtfs.name,
+                        log=log.name,
                         verbose=True,
                         source=[source.name],
                     )  # Log to silently tests verbose
