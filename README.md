@@ -58,7 +58,7 @@ The converter can also be integrated into any Python script as a module, for exa
     my_instance.dump(filename="output.zip")  # Finally, create GTFS
     del my_instance  # Cleanup temporary database
 
-Such an instance can be initialised with an `args` Namespace, in which values are keyed using the long-form command line argument (less its initial `--`). Alternatively such arguments may be set or changed on an existing instance, for example `my_instance.epsg=29903`.
+Such an instance can be initialised with an `args` Namespace, in which values are keyed using the long-form command line argument (less its initial `--`).
 
 The instance's internal Sqlite database can be queried directly using a cursor created as `my_instance.db.cursor()`. The structure of this database mimics that of the GTFS output, except table names are filenames stripped of their `.txt` (detailed by `_gtfs_structure` in `atcocif.py`).
 
