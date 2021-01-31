@@ -163,7 +163,10 @@ class atcocif:
             for key, value in arguments.items():
                 if key in self._arg_vars:
 
-                    if key in ["bh", "stt"] and value is not None:
+                    if (
+                        key in ["bank_holidays", "school_term"]
+                        and value is not None
+                    ):
                         setattr(
                             atcocif,
                             key,

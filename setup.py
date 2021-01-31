@@ -44,4 +44,5 @@ setuptools.setup(
             "pyproj",
         ],
     python_requires='>=3.3',  # According to vermin
+    include_package_data=True,
 )

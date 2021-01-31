@@ -90,6 +90,12 @@ def arguments():
     parser.version = __version__
 
     parser.add_argument(
+        "-V",
+        "--version",
+        action="version",
+        help="""Show version.""",
+    )
+    parser.add_argument(
         "source",
         nargs="+",
         help="""One or more ATCO.CIF data sources: directory, cif, url, zip
@@ -189,12 +195,6 @@ def arguments():
         defaults to warnings and errors only.""",
     )
     parser.add_argument(
-        "-V",
-        "--version",
-        action="version",
-        help="""Prints atcociftogtfs version and exits.""",
-    )
-    parser.add_argument(
         "-s",
         "--school_term",
         nargs="?",
@@ -250,7 +250,7 @@ def walk(source, processor):
         else:
             status = processor.file(filename=source)
             if status == 0:
-                logging.info("Completed %s", os.path.basename(source))
+                logging.info("Processed %s", os.path.basename(source))
 
     else:
 
